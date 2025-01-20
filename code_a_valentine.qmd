@@ -1,0 +1,51 @@
+---
+title: "Code a Valentine!"
+format: pdf
+---
+
+```{r}
+library(tidyverse)
+library(NHANES)
+library(emojifont)
+
+NHANES <- mutate(NHANES, 
+          heart = fontawesome("fa-heart"))
+
+ggplot(data = NHANES, 
+       mapping = aes(x = Age,
+                     y = Height,
+                     label = heart)) +
+  geom_text(alpha = 0.2, color = "red",
+            family='fontawesome-webfont',
+            size = 16) +
+  stat_smooth(color = "deeppink")
+```
+
+```{r}
+# Generate heart coordinates
+t <- seq(-pi,pi,0.04)
+x <- 16*0.25*(3*sin(t) - sin(3*t))
+y <- 13*cos(t) - 5*cos(2*t) - cos(4*t)
+heart_data <- data.frame(x, y)  %>%
+  mutate(heart = fontawesome("fa-heart"))
+
+
+
+# Make Valentine graph!
+ggplot(data = heart_data, 
+       mapping = aes(x = x, y = y,
+                     label = heart)) +
+  geom_text(alpha = 0.2, color = "deeppink",
+            family='fontawesome-webfont',
+            size = 7*2) +
+  theme_void() + 
+  annotate("text", x = 0, y = 2, 
+           label = "Happy Valentine's Day", size = 20,
+           color = "deeppink3") + 
+  annotate("text", x = 0, y = 0, label = "Insert Name",
+           size = 20, color = "deeppink3")
+
+ggsave("heart.png")
+```
+
+https://art-from-code.netlify.app/day-1/session-3/
