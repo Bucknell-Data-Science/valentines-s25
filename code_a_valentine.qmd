@@ -1,51 +1,234 @@
 ---
 title: "Code a Valentine!"
+author: "International Love Data Week"
+date: "Feb 11, 2025"
 format: pdf
 ---
 
+This document contains instructions for creating images for a valentine or art using `R` code. You should experiment and get creative with all of the options before deciding which one to include on your valentine card. Each option includes an example and then a place for you to modify the code and create something that is unique to you!
+
+We have lots of helper here to walk you through how to run and modify the code. Please raise your hand if you need help.
+
+XXX Include instructions on running code.
+
+# Option 1: Heart of Hearts!
+
+## Example
+
+Run the following code to create a heart of hearts.
+
 ```{r}
+# Load packages
 library(tidyverse)
-library(NHANES)
 library(emojifont)
+library(showtext)
+showtext_opts(dpi = 500)
 
-NHANES <- mutate(NHANES, 
-          heart = fontawesome("fa-heart"))
 
-ggplot(data = NHANES, 
-       mapping = aes(x = Age,
-                     y = Height,
-                     label = heart)) +
-  geom_text(alpha = 0.2, color = "red",
-            family='fontawesome-webfont',
-            size = 16) +
-  stat_smooth(color = "deeppink")
-```
+# Generate dataset with heart coordinates
+heart_x <- function(angle) {
+  x <- (16 * sin(angle) ^ 3) / 17
+  return(x - mean(x))
+}
 
-```{r}
-# Generate heart coordinates
-t <- seq(-pi,pi,0.04)
-x <- 16*0.25*(3*sin(t) - sin(3*t))
-y <- 13*cos(t) - 5*cos(2*t) - cos(4*t)
-heart_data <- data.frame(x, y)  %>%
+heart_y <- function(angle) {
+  y <- (13 * cos(angle) - 5 * cos(2 * angle) - 2 * cos(3 * angle) -
+          cos(4 * angle)) / 17
+  return(y - mean(y))
+}
+
+heart_data <- tibble(
+  angle = seq(0, 2 * pi, length.out = 50),
+  x = heart_x(angle),
+  y = heart_y(angle)
+) %>%
   mutate(heart = fontawesome("fa-heart"))
 
 
 
-# Make Valentine graph!
+#####
+# Experiment with these items
+#####
+# Try changing the colors
+color_heart = sample(c("deeppink", "purple3", "red3"), 
+                     size = 50, replace = TRUE) 
+color_text = "deeppink3"
+# Add your valentine's name
+valentines_name = "Insert Name"
+
+# Play around with the size of the hearts
+heart_size = 14
+
+# Make the hearts more or less opaque
+how_opaque = 0.6
+
+####
+
+# Graph the hearts and name of valentine
 ggplot(data = heart_data, 
        mapping = aes(x = x, y = y,
                      label = heart)) +
-  geom_text(alpha = 0.2, color = "deeppink",
+  geom_text(alpha = how_opaque, color = color_heart,
             family='fontawesome-webfont',
-            size = 7*2) +
+            size = heart_size) +
   theme_void() + 
-  annotate("text", x = 0, y = 2, 
-           label = "Happy Valentine's Day", size = 20,
-           color = "deeppink3") + 
-  annotate("text", x = 0, y = 0, label = "Insert Name",
-           size = 20, color = "deeppink3")
+  annotate("text", x = 0, y = 0, 
+           label = "Happy Valentine's Day", size = 12,
+           color = color_text) + 
+  annotate("text", x = 0, y = -0.25, label = valentines_name,
+           size = 12, color = color_text) 
 
-ggsave("heart.png")
+ggsave("option1_example.png", dpi = 500)
 ```
 
-https://art-from-code.netlify.app/day-1/session-3/
+## Your turn!
+
+XXX
+
+## Option 2
+
+```{r}
+
+# Graph the hearts and name of valentine
+ggplot(data = heart_data, 
+       mapping = aes(x = x, y = y,
+                     label = heart)) + 
+    geom_polygon(fill = "deeppink1", show.legend = FALSE,
+                 color = "deeppink3", size = 2) + 
+    coord_equal() + 
+  annotate("text", x = 0, y = 0.15, 
+           label = "Happy Valentine's Day", size = 12,
+           color = "white") + 
+  annotate("text", x = 0, y = -0.15, label = valentines_name,
+           size = 12, color = "white")  +
+  theme_void()
+
+ggsave("option2_example.png", dpi = 500)
+
+```
+
+```{r}
+normalise_radius <- function(x, min, max) {
+  normalise(x, from = c(-0.5, 0.5), to = c(min, max))
+}
+
+perlin_heart <- function(n = 100, 
+                         freq_init = 0.3,
+                         octaves = 2, 
+                         r_min = 0.5, 
+                         r_max = 1,
+                         x_shift = 0,
+                         y_shift = 0,
+                         id = NA,
+                         seed = NULL) {
+  if(!is.null(seed)) set.seed(seed)
+  tibble(
+    angle = seq(0, 2*pi, length.out = n),
+    x_base = cos(angle),
+    y_base = sin(angle),
+    radius = fracture(
+      x = x_base, 
+      y = y_base, 
+      freq_init = freq_init,
+      noise = gen_perlin, 
+      fractal = fbm, 
+      octaves = octaves
+    ) |>
+      normalise_radius(r_min, r_max),
+    x = radius * heart_x(angle) + x_shift,
+    y = radius * heart_y(angle) + y_shift,
+    id = id
+  )
+}
+
+perlin_heart(seed = 1)
+```
+
+# Testing
+
+<https://blog.djnavarro.net/posts/2021-10-19_rtistry-posts/>
+
+```{r}
+library(flametree)
+
+# pick some colours
+shades <- c("#1b2e3c", "#0c0c1e", "#74112f")
+
+# data structure defining the trees
+dat <- flametree_grow(time = 10, trees = 5)
+
+# draw the plot
+dat %>% 
+  flametree_plot(
+    background = "#f3e3e2",
+    palette = shades, 
+    style = "nativeflora"
+  )
+
+ggsave("option3_example.png", dpi = 500)
+```
+
+https://jasmines.djnavarro.net/
+
+```{r}
+library(jasmines)
+use_seed(1) %>%
+  entity_heart(grain = 1000) %>%
+  unfold_slice(iterations = 10) %>%
+  style_ribbon(
+    palette = "base", 
+    colour = "ind", 
+    background = "mistyrose"
+  ) %>%
+  style_overlay(border = "white")
+```
+
+
+```{r}
+use_seed(1) %>%
+  scene_discs(
+    rings = 3, points = 5000, size = 5
+  ) %>%
+  mutate(ind = 1:n()) %>%
+  unfold_warp(
+    iterations = 1,
+    scale = .5, 
+    output = "layer" 
+  ) %>%
+  unfold_tempest(
+    iterations = 20,
+    scale = .01
+  ) %>%
+  style_ribbon(
+    palette = palette_named("vik"),
+    colour = "ind",
+    alpha = c(.1,.1),
+    background = "oldlace"
+  )
+```
+
+
+```{r}
+library(jasmines)
+use_seed(1) %>%
+  scene_discs(
+    rings = 3, points = 5000, size = 5
+  ) %>%
+  mutate(ind = 1:n()) %>%
+  unfold_warp(
+    iterations = 1,
+    scale = .5, 
+    output = "layer" 
+  ) %>%
+  unfold_tempest(
+    iterations = 20,
+    scale = .01
+  ) %>%
+  style_ribbon(
+    palette = palette_named("vik"),
+    colour = "ind",
+    alpha = c(.1,.1),
+    background = "oldlace"
+  )
+```
+
