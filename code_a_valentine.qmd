@@ -11,7 +11,7 @@ editor_options:
   chunk_output_type: console
 ---
 
-This document contains instructions for creating images for a valentine or art using `R` code. We have lots of helper here to walk you through how to run and modify the code. Please raise your hand if you need help!
+This document contains instructions for creating images for a Valentine's card using `R` code. We have lots of helper here to walk you through how to run and modify the code. Please raise your hand if you need help!
 
 You should experiment and get creative with all of the options before deciding which one to include on your Valentine's card. Each option includes an example and then a place for you to modify the code and create something that is unique to you!
 
@@ -28,15 +28,11 @@ The following gray box is called an `R` **chunk**.
 5 - 2
 ```
 
-## One more thing!
-
-We want the plots to show up in the "Plots" window on the right. To make sure that happens, click on the white cog next to the "Render" button and check "Chunk Output in Console."
-
 # Option 1: Heart of Hearts!
 
 ## Example
 
-Run the following code to create a heart of hearts.
+Run the following code to create a heart of hearts. The created image is stored in a file called "option1_example.png". Make sure to look both in the Plot window and the output image as the size of the hearts and text may differ between the two. The output image is what you will be putting in your Valentine's card.
 
 ```{r}
 # Load packages
@@ -116,12 +112,13 @@ ggplot(data = heart_data,
            color = color_text,
            family = font_writing) 
 
-ggsave("option1_example.png", dpi = 500)
+ggsave("option1_example.png", dpi = 500, dpi = 1000, width = 7, height = 5,
+       units = "in")
 ```
 
 ## Your turn!
 
-**Tip**: This website is a good place to find hex codes for colors: <https://coolors.co/palettes/trending>
+**Tip**: The following website is a good place to find hex codes for colors: <https://coolors.co/palettes/trending>
 
 ```{r}
 
@@ -326,7 +323,11 @@ number_growing = 6
 shades = c("#5F0F40", "#9A031E", "#E36414", "#FB8B24")
 
 # Pick a background color
-color_background = "#0F4C5C"
+background_color = "#0F4C5C"
+
+# Play around with the style of trees
+# Options: "plain", "voronoi", "wisp", "nativeflora", "minimal"
+tree_style = "plain"
 
 # Add a message
 # Tips: "" = no message
@@ -359,7 +360,8 @@ dat <- flametree_grow(seed = number_random,
 dat %>% 
   flametree_plot(
     background = background_color,
-    palette = shades
+    palette = shades,
+    style = tree_style
   ) +
   annotate("text", 
            label = message,
@@ -371,17 +373,17 @@ dat %>%
 ggsave("option4_example.png", dpi = 500)
 ```
 
-# Testing
+# Option 4: Create Art
 
-<https://blog.djnavarro.net/posts/2021-10-19_rtistry-posts/>
+The `jasmines` package allows you to create interesting shapes that have some stochastic elements.
 
-```         
-```
-
-https://jasmines.djnavarro.net/
+## Example
 
 ```{r}
+# Load package
 library(jasmines)
+
+# Create flowy rings
 use_seed(4) %>%
   scene_discs(
     rings = 4, points = 5000, size = 6
@@ -389,8 +391,8 @@ use_seed(4) %>%
   mutate(ind = 1:n()) %>%
   unfold_warp(
     iterations = 1,
-    scale = .5, 
-    output = "layer" 
+    scale = .5,
+    output = "layer"
   ) %>%
   unfold_tempest(
     iterations = 20,
@@ -403,29 +405,67 @@ use_seed(4) %>%
     background = "gray90"
   )
 
-ggsave("option4_example.png", dpi = 500)
+ggsave("option5_example.png", dpi = 500)
 ```
 
+## Your turn!
+
 ```{r}
-library(jasmines)
-use_seed(10) %>%
+#########
+# Change the following
+#########
+
+# Pick the number of rings
+number_rings = 3
+
+# Pick the number of interior points
+number_points = 5000
+
+# Pick a diameter for the outermost ring
+diameter = 10
+
+# Pick a random number, it impacts the distortions in the rings
+number_random = 8
+
+# Pick a background color
+# Great options: "antiquewhite", "wheat", "black"
+background_color = "antiquewhite"
+
+# Pick a color palette
+# Some of the options: "magma", "vik", "acton", "bamako", "batlow", "berlin", "bilbao", 
+# "broc", "buda", "cork", "davos", "devon", "grayC", "hawaii", 
+# "imola", "lajolla", "lapaz", "lisbon", "nuuk", "oleron", 
+# "oslo", "roma", "tofino", "tokyo", "turku", "vik"
+color_palette = "tofino"
+
+########
+
+# Create flowy rings
+use_seed(number_random) %>%
   scene_discs(
-    rings = 3, points = 5000, size = 5
+    rings = number_rings,
+    points = number_points,
+    size = 10
   ) %>%
   mutate(ind = 1:n()) %>%
   unfold_warp(
     iterations = 1,
-    scale = .5, 
-    output = "layer" 
+    scale = 0.5,
+    output = "layer"
   ) %>%
   unfold_tempest(
     iterations = 20,
-    scale = .01
+    scale = .011
   ) %>%
   style_ribbon(
-    palette = palette_named("vik"),
+    palette = color_palette,
     colour = "ind",
-    alpha = c(.1,.1),
-    background = "oldlace"
+    alpha = c(.5, .1),
+    background = background_color
   )
+
+ggsave("option5_example.png", dpi = 500)
+
 ```
+
+There are lots of other shapes and distortions you can play around with in the `jasmines` package: <https://jasmines.djnavarro.net/index.html>.
