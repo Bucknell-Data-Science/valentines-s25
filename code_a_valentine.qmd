@@ -112,7 +112,7 @@ ggplot(data = heart_data,
            color = color_text,
            family = font_writing) 
 
-ggsave("option1_example.png", dpi = 500, dpi = 1000, width = 7, height = 5,
+ggsave("option1_example.png", dpi = 1000, width = 7, height = 5,
        units = "in")
 ```
 
