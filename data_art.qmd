@@ -1,0 +1,363 @@
+---
+title: "Data Art!"
+author: "Dominguez Center for Data Science"
+date: "July 23rd, 2025"
+format: pdf
+editor: visual
+execute: 
+  warning: false
+  message: false
+editor_options: 
+  chunk_output_type: console
+---
+
+This document contains instructions for creating art in `R`. Please raise your hand if you need help! Experiment with the start code below and get creative!
+
+**Tip**: The following website is a good place to find hex codes for colors: <https://coolors.co/palettes/trending>
+
+# But First: How to Run and Modify Code!
+
+The following gray box is called an `R` **chunk**.
+
+-   To run all of the code in the gray box, click on the green triangle.
+
+-   To run a single line of code, put the cursor on the line you want to run and hit Command+Enter (for a Mac) and Control+Enter (for Windows).
+
+```{r}
+2 + 2
+5 - 2
+```
+
+# Example 1: Grow a Forest
+
+The next two options come from [Danielle Navarro](https://djnavarro.net/), a data scientist and generative artist. She licenses all her code for creating generative art in `R` using creative common licenses so that others can use her code to create their own art!
+
+Run the following code to grow your own forest.
+
+```{r}
+# Load packages
+library(tidyverse) # Plotting
+library(flametree) #Danielle's package
+library(emojifont)
+
+# Pick some colors
+shades = c("#5F0F40", "#9A031E", "#E36414", "#FB8B24")
+
+# Ensure the exported images are the same size in the Plots window
+library(showtext)
+showtext_opts(dpi = 1000)
+
+# Add more font options
+font_add_google("Merriweather")
+font_add_google("Lora")
+
+# Font
+font_writing = "Lora"
+
+# Grow the trees
+dat = flametree_grow(seed = 8,
+                      time = 6, 
+                      trees = 5)
+
+# Draw the trees
+dat %>% 
+  flametree_plot(
+    background = "#0F4C5C",
+    palette = shades
+  ) +
+  annotate("text", x = -2.5, y = 1, 
+           label = "Hug\n a\n Tree",
+           size = 12, color = "#FB8B24",
+           family = font_writing)
+
+ggsave("tree_example.png", dpi = 500)
+```
+
+## Your turn!
+
+```{r}
+#########
+# Change the following
+#########
+
+# Determine how many trees you want
+number_trees = 5
+
+# Pick a random number for growing the trees 
+# Impacts their location
+number_random = 8
+
+# Determine how much growing (larger number = more growth)
+number_growing = 6
+
+# Pick some new colors
+shades = c("#5F0F40", "#9A031E", "#E36414", "#FB8B24")
+
+# Pick a background color
+background_color = "#0F4C5C"
+
+# Play around with the style of trees
+# Options: "plain", "voronoi", "wisp", "nativeflora", "minimal"
+tree_style = "plain"
+
+# Add a message
+# Tips: "" = no message
+# \n = new line
+message = "Hug\n a\n Tree"
+
+# Pick the size of the message
+message_size = 12
+
+# Pick the x location and y location of the message
+message_x = -2.5
+message_y = 1
+
+# Pick the color of the message
+message_color = "#FB8B24"
+
+# Change the font
+# Add more font options from Google Fonts
+font_add_google("Lora")
+message_font = "Lora"
+
+#########
+
+# Grow the trees
+dat <- flametree_grow(seed = number_random,
+                      time = number_growing, 
+                      trees = number_trees)
+
+# draw the plot
+dat %>% 
+  flametree_plot(
+    background = background_color,
+    palette = shades,
+    style = tree_style
+  ) +
+  annotate("text", 
+           label = message,
+           size = message_size,
+           x = message_x, y = message_y, 
+           color = message_color,
+           family = message_font)
+
+ggsave("trees.png", dpi = 500)
+```
+
+# Example 2: Shapes!
+
+The `jasmines` package allows you to create interesting shapes that have some stochastic elements.
+
+```{r}
+# Load package
+library(jasmines)
+
+# Create flowy rings
+use_seed(4) %>%
+  scene_discs(
+    rings = 4, points = 5000, size = 6
+  ) %>%
+  mutate(ind = 1:n()) %>%
+  unfold_warp(
+    iterations = 1,
+    scale = .5,
+    output = "layer"
+  ) %>%
+  unfold_tempest(
+    iterations = 20,
+    scale = .011
+  ) %>%
+  style_ribbon(
+    palette = "magma",
+    colour = "ind",
+    alpha = c(.5,.1),
+    background = "gray90"
+  )
+
+ggsave("shape_example.png", dpi = 500)
+```
+
+## Your turn!
+
+```{r}
+#########
+# Change the following
+#########
+
+# Pick the number of rings
+number_rings = 3
+
+# Pick the number of interior points
+number_points = 5000
+
+# Pick a diameter for the outermost ring
+diameter = 10
+
+# Pick a random number, it impacts the distortions in the rings
+number_random = 8
+
+# Pick a background color
+# Great options: "antiquewhite", "wheat", "black"
+background_color = "antiquewhite"
+
+# Pick a color palette
+# Some of the options: "magma", "vik", "acton", "bamako", "batlow", "berlin", "bilbao", 
+# "broc", "buda", "cork", "davos", "devon", "grayC", "hawaii", 
+# "imola", "lajolla", "lapaz", "lisbon", "nuuk", "oleron", 
+# "oslo", "roma", "tofino", "tokyo", "turku", "vik"
+color_palette = "tofino"
+
+########
+
+# Create flowy rings
+use_seed(number_random) %>%
+  scene_discs(
+    rings = number_rings,
+    points = number_points,
+    size = 10
+  ) %>%
+  mutate(ind = 1:n()) %>%
+  unfold_warp(
+    iterations = 1,
+    scale = 0.5,
+    output = "layer"
+  ) %>%
+  unfold_tempest(
+    iterations = 20,
+    scale = .011
+  ) %>%
+  style_ribbon(
+    palette = color_palette,
+    colour = "ind",
+    alpha = c(.5, .1),
+    background = background_color
+  )
+
+ggsave("shapes.png", dpi = 500)
+
+```
+
+There are lots of other shapes and distortions you can play around with in the `jasmines` package: <https://jasmines.djnavarro.net/index.html>.
+
+# Example 3: aRtsy
+
+The `aRtsy` package by Koen Derks has lots of great functions for creating generative art in `R`. Here are a few examples but I strongly recommend also playing with some of the other functions in the package.
+
+Package site: <https://koenderks.github.io/aRtsy/reference/index.html>
+
+```{r}
+
+# Load the package
+library(aRtsy)
+
+# Create Bucknell palettes
+
+bucknell_colors = c("#E87722", "#003865", "#FFFFFF", "#FFA300",
+                    "#0082BA", "#59CBE8", "#D9D9D6", "#A7A8AA", "#000000" )
+
+bucknell_colors_alt = c("#E87722","#FFA300", "#FFFFFF",
+                        "#0082BA", "#59CBE8",  "#003865")
+
+# Paint strokes
+set.seed(9)
+canvas_strokes(colors = bucknell_colors,
+               neighbors = 2,
+               p = 0.02, 
+               resolution = 500)
+
+set.seed(41)
+canvas_swirls(colors = bucknell_colors, 
+              background = "#000000",
+              lwd = 0.25,
+              curvature = 0.005,
+              iterations = 500, 
+              n = 20)
+
+
+set.seed(22)
+canvas_watercolors(colors = rep(bucknell_colors_alt, 2),
+                   layers = 50,
+                   depth = 3, 
+                   resolution = 250)
+
+
+set.seed(31)
+canvas_blacklight(colors = bucknell_colors_alt)
+
+
+set.seed(11)
+canvas_flow(colors = bucknell_colors,
+            lines = 300,
+            lwd = 1,
+            polar = TRUE)
+
+ggsave("flow.png", dpi = 1000)
+
+```
+
+## Your turn!
+
+Try changing:
+
+-   `set.seed()`
+
+-   The arguments of the functions
+
+-   Try different color palettes. (Use `?colorPalette` to view built-in options.)
+
+```{r}
+
+# Load the package
+library(aRtsy)
+
+# Create Bucknell palettes
+
+bucknell_colors = c("#E87722", "#003865", "#FFFFFF", "#FFA300",
+                    "#0082BA", "#59CBE8", "#D9D9D6", "#A7A8AA", "#000000" )
+
+bucknell_colors_alt = c("#E87722","#FFA300", "#FFFFFF",
+                        "#0082BA", "#59CBE8",  "#003865")
+
+# Different color palettes
+blossom <- colorPalette("blossom")
+boogy3 <- colorPalette("boogy3")
+dark3 <- colorPalette("dark3")
+
+# Paint strokes
+set.seed(9)
+canvas_strokes(colors = blossom,
+               neighbors = 2,
+               p = 0.02, 
+               resolution = 500)
+
+set.seed(41)
+canvas_swirls(colors = bucknell_colors, 
+              background = "#000000",
+              lwd = 0.25,
+              curvature = 0.005,
+              iterations = 500, 
+              n = 20)
+
+
+set.seed(22)
+canvas_watercolors(colors = rep(dark3, 2),
+                   layers = 50,
+                   depth = 3, 
+                   resolution = 250)
+
+
+set.seed(29)
+canvas_blacklight(colors = dark3)
+
+
+set.seed(11)
+canvas_flow(colors = bucknell_colors,
+            lines = 300,
+            lwd = 1,
+            polar = TRUE)
+
+ggsave("flow.png", dpi = 1000)
+
+```
+
+Consider sharing your favorite creation in the "Come create some aRt with code" thread of the #general channel in the DCDS Slack.
